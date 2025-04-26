@@ -10,8 +10,7 @@ module Search
     end
 
     def search
-      query
-      # formatter is needed for the output
+      Formatters::Sailings.format(query)
     end
 
     private
