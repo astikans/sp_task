@@ -1,9 +1,18 @@
 class Sailing < ApplicationRecord
   validates :departure_date, :arrival_date, :days, :cost_in_eur, presence: true
+  validate :departure_date_before_arrival_date
 
   belongs_to :origin_port, class_name: "Port"
   belongs_to :destination_port, class_name: "Port"
   belongs_to :sailing_rate
+
+  private
+
+  def departure_date_before_arrival_date
+    if departure_date && arrival_date && departure_date >= arrival_date
+      errors.add(:departure_date, "must be before arrival date")
+    end
+  end
 end
 
 # == Schema Information
