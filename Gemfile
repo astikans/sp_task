@@ -34,6 +34,7 @@ gem "awesome_print", "~> 1.9"
 
 group :development do
   gem "annotate"
+  gem "database_consistency", require: false # run it: bundle exec database_consistency
 end
 
 group :development, :test do

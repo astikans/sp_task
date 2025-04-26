@@ -1,0 +1,16 @@
+DatabaseConsistencySettings:
+  color: true # Brings color tags to console output.
+  # log_level: DEBUG # Sets the log level. DEBUG outputs all checks including those that successfully passed.
+
+# Every checker is enabled by default.
+DatabaseConsistencyCheckers:
+  All:
+    enabled: true # You can disable everything until you explicitly enable it.
+  MissingIndexChecker:
+    enabled: true # Enables/disables the checker entirely/globally. If disabled here, nothing can enable it back.
+  MissingUniqueIndexChecker:
+    enabled: true
+  ColumnPresenceChecker:
+    enabled: true
+  NullConstraintChecker:
+    enabled: true
