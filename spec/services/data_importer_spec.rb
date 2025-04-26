@@ -115,11 +115,11 @@ RSpec.describe DataImporter, type: :service do
       it 'rolls back the transaction if any records are invalid' do
         allow_any_instance_of(ExchangeRate).to receive(:valid?).and_return(false)
         expect_any_instance_of(ExchangeRate).to receive(:errors).at_least(:once).and_return(
-          double(full_messages: ['Date cannot be blank'])
+          double(full_messages: ['Date cannot be blank'], details: {})
         )
 
         expect {
-          expect { importer.call }.to raise_error(ActiveRecord::RecordInvalid)
+          expect { importer.call }.to raise_error(ErrorHandler::RaisedError, /Invalid record/)
         }.not_to change { ExchangeRate.count }
       end
     end
@@ -133,7 +133,7 @@ RSpec.describe DataImporter, type: :service do
 
         expect {
           invalid_importer.call
-        }.to raise_error(NoMethodError)
+        }.to raise_error(ErrorHandler::RaisedError, /Failed to find.*SailingRate/)
       end
 
       it 'raises an error when required exchange rate is missing' do
@@ -144,7 +144,7 @@ RSpec.describe DataImporter, type: :service do
 
         expect {
           invalid_importer.call
-        }.to raise_error(NoMethodError)
+        }.to raise_error(ErrorHandler::RaisedError, /Failed to find.*ExchangeRate/)
       end
     end
   end

@@ -28,6 +28,8 @@
 # }
 
 class DataImporter
+  include ErrorHandler::Wrapper
+
   def self.call(json_data)
     new(json_data).call
   end
@@ -38,9 +40,11 @@ class DataImporter
 
   def call
     ActiveRecord::Base.transaction do
-      import_exchange_rates
-      import_sailing_rates
-      import_sailings_and_ports
+      with_error_handling do
+        import_exchange_rates
+        import_sailing_rates
+        import_sailings_and_ports
+      end
     end
   end
 
@@ -103,11 +107,15 @@ class DataImporter
   end
 
   def lookup_sailing_rate(sailing_code)
-    SailingRate.find_by(code: sailing_code)
+    lookup_with_error_handling(SailingRate, code: sailing_code) do
+      SailingRate.find_by!(code: sailing_code)
+    end
   end
 
   def exchange_rate_for(date, currency)
-    ExchangeRate.find_by(date: date).rates[currency.downcase]
+    lookup_with_error_handling(ExchangeRate, date: date, currency: currency) do
+      ExchangeRate.find_by!(date: date).rates[currency.downcase]
+    end
   end
 
   def cost_in_eur(sailing_rate, date)
