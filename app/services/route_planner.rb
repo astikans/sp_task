@@ -1,3 +1,18 @@
+# This class finds the optimal path between two points using a modified Dijkstra's algorithm
+# It is a generic implementation that can work with any objects that have:
+# - A cost method (specified in mapping[:object_method_cost])
+# - A point A method (specified in mapping[:object_method_point_a])
+# - A point Z method (specified in mapping[:object_method_point_z])
+# - A start date method (specified in mapping[:object_method_start_date])
+# - An end date method (specified in mapping[:object_method_end_date])
+#
+# @param objects [ActiveRecord::Relation] Collection of objects to search through
+# @param point_a [Integer] ID of the starting point
+# @param point_z [Integer] ID of the ending point
+# @param start_date [Date] Earliest allowed start date
+# @param mapping [Hash] Methods to use for accessing object attributes
+# @return [Array<Integer>] Array of object IDs representing the optimal path
+
 class RoutePlanner
   class InvalidInputError < StandardError; end
 
@@ -5,12 +20,12 @@ class RoutePlanner
     new(...).call
   end
 
-  def initialize(sailings:, cost_method:, origin_port:, destination_port:, start_date:)
-    @sailings = sailings
-    @cost_method = cost_method
-    @origin_port = origin_port
-    @destination_port = destination_port
+  def initialize(objects:, point_a:, point_z:, start_date:, mapping: {})
+    @objects = objects
+    @point_a = point_a
+    @point_z = point_z
     @start_date = start_date
+    set_objects_from_mapping(mapping)
   end
 
   def call
@@ -21,12 +36,24 @@ class RoutePlanner
 
   private
 
-  def valid_inputs?
-    [@sailings, @cost_method, @origin_port, @destination_port, @start_date].all?(&:present?)
+  def set_objects_from_mapping(mapping)
+    @object_method_cost = mapping[:object_method_cost]
+    @object_method_point_a = mapping[:object_method_point_a]
+    @object_method_point_z = mapping[:object_method_point_z]
+    @object_method_start_date = mapping[:object_method_start_date]
+    @object_method_end_date = mapping[:object_method_end_date]
   end
 
-  def sailings_by_origin
-    @sailings_by_origin ||= @sailings.group_by(&:origin_port_id)
+  def valid_inputs?
+    [
+      @objects, @point_a, @point_z, @start_date,
+      @object_method_cost, @object_method_point_a, @object_method_point_z,
+      @object_method_start_date, @object_method_end_date
+    ].all?(&:present?)
+  end
+
+  def objects_by_origin
+    @objects_by_origin ||= @objects.group_by(&@object_method_point_a)
   end
 
   def find_cheapest_path
@@ -36,32 +63,32 @@ class RoutePlanner
     min_cost = Float::INFINITY
 
     until queue.empty?
-      cost, current_sailing, path = queue.shift
+      cost, current_object, path = queue.shift
 
       # Skip if already visited this state
-      state_key = [current_sailing.departure_date, current_sailing.arrival_date]
+      state_key = [current_object.send(@object_method_start_date), current_object.send(@object_method_end_date)]
       next if visited.include?(state_key)
 
       visited << state_key
 
       # Check if we reached the destination
-      if destination_reached?(current_sailing, cost, min_cost)
+      if destination_reached?(current_object, cost, min_cost)
         best_path = path
         min_cost = cost
         next
       end
 
-      # Explore next possible sailings
-      explore_next_sailings(queue, current_sailing, cost, path)
+      # Explore next possible objects
+      explore_next_objects(queue, current_object, cost, path)
     end
 
     best_path.map(&:id)
   end
 
   def initialize_queue
-    sailings_by_origin[@origin_port.id]&.each_with_object([]) do |sailing, queue|
-      next if sailing.departure_date < @start_date
-      queue << [sailing.send(@cost_method), sailing, [sailing]]
+    objects_by_origin[@point_a]&.each_with_object([]) do |object, queue|
+      next if object.send(@object_method_start_date) < @start_date
+      queue << [object.send(@object_method_cost), object, [object]]
     end || []
   end
 
@@ -69,19 +96,19 @@ class RoutePlanner
     initialize_queue.sort_by! { |cost, *_| cost }
   end
 
-  def destination_reached?(sailing, cost, min_cost)
-    sailing.destination_port_id == @destination_port.id && cost < min_cost
+  def destination_reached?(object, cost, min_cost)
+    object.send(@object_method_point_z) == @point_z && cost < min_cost
   end
 
-  def explore_next_sailings(queue, current_sailing, current_cost, current_path)
-    next_sailings = sailings_by_origin[current_sailing.destination_port_id]
+  def explore_next_objects(queue, current_object, current_cost, current_path)
+    next_objects = objects_by_origin[current_object.send(@object_method_point_z)]
 
-    next_sailings&.each do |next_sailing|
-      if next_sailing.departure_date >= current_sailing.arrival_date
+    next_objects&.each do |next_object|
+      if next_object.send(@object_method_start_date) >= current_object.send(@object_method_end_date)
         queue << [
-          current_cost + next_sailing.send(@cost_method),
-          next_sailing,
-          current_path + [next_sailing]
+          current_cost + next_object.send(@object_method_cost),
+          next_object,
+          current_path + [next_object]
         ]
       end
     end
