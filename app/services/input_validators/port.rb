@@ -1,3 +1,6 @@
+# This class validates user input for port codes
+# It inherits from InputValidators::Base and implements the required methods
+# The port code must exist in the Port model's database records
 module InputValidators
   class Port < Base
     def error_message

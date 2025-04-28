@@ -1,3 +1,7 @@
+# This class handles user input for port codes
+# It inherits from Inputs::Base and implements the required methods
+# The port_type parameter determines whether this is an origin or destination port
+# The port code must exist in the Port model's database records
 module Inputs
   class Port < Base
 

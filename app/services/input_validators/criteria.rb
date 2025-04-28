@@ -1,3 +1,6 @@
+# This class validates user input for search criteria
+# It inherits from InputValidators::Base and implements the required methods
+# The criteria must be one of the predefined values in Inputs::Criteria::AVAILABLE_CRITERIA
 module InputValidators
   class Criteria < Base
     def error_message
