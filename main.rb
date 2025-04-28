@@ -5,4 +5,6 @@ origin_port = Inputs::Port.input(port_type: "origin port")
 destination_port = Inputs::Port.input(port_type: "destination port")
 criteria = Inputs::Criteria.input
 
-# TODO: search and print results
+search_class = CriteriaConstants::AVAILABLE_CRITERIA[criteria].constantize
+result = search_class.search(origin_port, destination_port)
+ap result  # Use awesome_print to prettify the output
