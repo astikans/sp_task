@@ -22,7 +22,7 @@ The system will then calculate and display the optimal route based on your crite
 
 ### Run
 1) Clone the repository: `git clone git@github.com:astikans/sp_task.git && cd sp_task`
-2) Start the application: `docker-compose up -d`
+2) Start the application and seed data from response.json: `docker-compose up -d`
 3) Run the main program: `docker exec -it sp_task-app-1 bash -c "bundle exec ruby main.rb"`
 
 ### Additional commands
@@ -92,6 +92,8 @@ The project uses PostgreSQL with the following tables:
 
 - **Annotate** - Added to automatically generate schema information in model files, enhancing code readability and providing quick reference to database structure directly in the model classes.
 - **Database Consistency** - Ensures database schema and model validations stay in sync, preventing data integrity issues by validating consistency between database constraints and application-level validations.
+- **Shoulda Matchers** - Provides simple one-liner tests for common Rails functionality, making model validation and association tests more concise and readable.
+- **Awesome Print** - Enhances debugging by providing pretty printing of Ruby objects with syntax highlighting and indentation, making complex data structures easier to inspect.
 
 ### Code structure
 
@@ -163,10 +165,27 @@ sp_task/
 │   ├── main_spec.rb         # Tests for the CLI entry point
 │   ├── rails_helper.rb      # Rails-specific test configuration
 │   └── spec_helper.rb       # General RSpec configuration
-├── Dockerfile               # Docker configuration for production
+├── Dockerfile.dev           # Docker configuration for production
 ├── docker-compose.yml       # Docker Compose configuration
 ├── Gemfile                  # Ruby dependencies
 ├── Gemfile.lock             # Locked Ruby dependencies
 ├── response.json            # Sample data
 └── README.md                # Project documentation
 ```
+
+## Conclusion
+
+This project demonstrates a solution for optimizing shipping routes based on multiple criteria (cheapest, cheapest-direct, fastest). Built with Ruby on Rails and PostgreSQL, it implements a flexible graph-based routing algorithm that handles complex shipping networks effectively. The service architecture provides clear separation of concerns, making the codebase maintainable and extensible. The system converts all rates to EUR based on exchange rates specific to sailing dates, ensuring accurate cost calculations across different currencies.
+
+## About me
+
+With years of experience in Ruby on Rails, cloud architectures, and AI-driven automation, I help businesses streamline workflows, enhance security, and build scalable systems that deliver real results.
+
+### Contact Information
+- **Name:** Andris Stikans
+- **Email:** andris.stikans@gmail.com
+- **Phone:** +371 28666366
+- **Address:** Sigulda, Latvia
+- **LinkedIn:** [linkedin.com/in/andris-stikans](https://www.linkedin.com/in/andris-stikans)
+- **Portfolio:** [andris.stikans.taurus.lv](https://andris.stikans.taurus.lv/)
+
