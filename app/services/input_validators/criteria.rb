@@ -5,14 +5,18 @@ module InputValidators
   class Criteria < Base
     def error_message
       %{Invalid criteria. Next time, please enter a valid criteria from the
-        following list: #{Inputs::Criteria::AVAILABLE_CRITERIA.join(", ")}
+        following list: #{available_criteria_input_values.join(", ")}
       }.squish
     end
 
     private
 
     def valid?
-      Inputs::Criteria::AVAILABLE_CRITERIA.include?(@input)
+      available_criteria_input_values.include?(@input)
+    end
+
+    def available_criteria_input_values
+      CriteriaConstants::AVAILABLE_CRITERIA.keys
     end
   end
 end

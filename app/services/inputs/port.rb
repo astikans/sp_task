@@ -4,7 +4,6 @@
 # The port code must exist in the Port model's database records
 module Inputs
   class Port < Base
-
     private
 
     def port_type

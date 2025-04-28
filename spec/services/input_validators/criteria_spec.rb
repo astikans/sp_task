@@ -53,7 +53,8 @@ RSpec.describe InputValidators::Criteria do
     it 'returns a message with the list of available criteria' do
       validator = described_class.new('invalid')
 
-      allow(Inputs::Criteria::AVAILABLE_CRITERIA).to receive(:join).with(", ").and_return('cheapest, fastest, cheapest-direct')
+      allow(CriteriaConstants::AVAILABLE_CRITERIA).to receive(:keys).and_return(['cheapest', 'fastest', 'cheapest-direct'])
+      allow(CriteriaConstants::AVAILABLE_CRITERIA.keys).to receive(:join).with(", ").and_return('cheapest, fastest, cheapest-direct')
 
       expected_message = "Invalid criteria. Next time, please enter a valid criteria from the following list: cheapest, fastest, cheapest-direct"
       expect(validator.error_message).to eq(expected_message)

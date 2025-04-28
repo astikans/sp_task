@@ -6,12 +6,10 @@
 # - fastest: finds the fastest route between ports
 module Inputs
   class Criteria < Base
-    AVAILABLE_CRITERIA = ["cheapest-direct", "cheapest", "fastest"]
-
     private
 
     def prompt_message
-      "Enter the criteria (#{AVAILABLE_CRITERIA.join(", ")}): "
+      "Enter the criteria (#{available_criteria_input_values.join(", ")}): "
     end
 
     def validator_class
@@ -20,6 +18,10 @@ module Inputs
 
     def return_valid_value
       @input
+    end
+
+    def available_criteria_input_values
+      CriteriaConstants::AVAILABLE_CRITERIA.keys
     end
   end
 end
